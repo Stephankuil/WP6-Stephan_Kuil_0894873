@@ -16,7 +16,15 @@ def test_pacman_initialization():
 
 
 def test_pacman_move():
-    assert False, "nog niet in gebruik"
+    pacman = Pacman(3, 0, 0, 0, "geel", "Pacman")
+    pacman.move("up")
+    assert pacman.Ycoordinaat == 1
+    pacman.move("down")
+    assert pacman.Ycoordinaat == 0
+    pacman.move("left")
+    assert pacman.Xcoordinaat == -1
+    pacman.move("right")
+    assert pacman.Xcoordinaat == 0
 
 #unhappy path test######################################
 def test_pacman_initialization_unhappy():
