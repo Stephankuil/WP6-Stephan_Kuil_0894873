@@ -14,3 +14,8 @@ def test_spookjes_initialization():
     assert spookjes.opeetbaar == True
 
 
+#Unhappy Path Test######################################
+
+def test_spookjes_initialization_unhappy():
+    with pytest.raises(ValueError):
+        spookjes = Spookjes("-1", "Blinky", "rood", 5, 5, True)
