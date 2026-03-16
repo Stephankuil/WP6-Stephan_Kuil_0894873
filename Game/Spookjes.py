@@ -1,15 +1,24 @@
 class Spookjes:
-    def __init__(self, aantal_spookjes, naam, kleur, x_coordinaat, y_coordinaat, opeetbaar):
-            if not isinstance(aantal_spookjes, int):
-                raise ValueError("aantal_spookjes moet een integer zijn")
-            if aantal_spookjes < 0:
-                raise ValueError("aantal_spookjes mag niet negatief zijn")
-            self.aantal_spookjes = aantal_spookjes
-            self.naam = naam
-            self.kleur = kleur
-            self.x_coordinaat = x_coordinaat
-            self.y_coordinaat = y_coordinaat
-            self.opeetbaar = opeetbaar
+    def __init__(self, naam, kleur, x_coordinaat, y_coordinaat, opeetbaar):
+        if not isinstance(naam, str):
+            raise ValueError("naam moet een string zijn")
+        if not isinstance(kleur, str):
+            raise ValueError("kleur moet een string zijn")
+
+        self.naam = naam
+        self.kleur = kleur
+        self.x_coordinaat = x_coordinaat
+        self.y_coordinaat = y_coordinaat
+        self.opeetbaar = opeetbaar
+
+
+
+    def hitpacman(self, pacman):
+        if self.opeetbaar:
+            pacman.score += 10
+            self.aantal_spookjes -= 1
+        else:
+            pacman.levens -= 1
 
 
 

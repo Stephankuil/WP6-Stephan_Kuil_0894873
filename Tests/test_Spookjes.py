@@ -5,17 +5,44 @@ from Game.Spookjes import Spookjes
 #Happy Path Test######################################
 
 def test_spookjes_initialization():
-    spookjes = Spookjes(4, "Blinky", "rood", 5, 5, True)
-    assert spookjes.aantal_spookjes == 4
-    assert spookjes.naam == "Blinky"
-    assert spookjes.kleur == "rood"
-    assert spookjes.x_coordinaat == 5
-    assert spookjes.y_coordinaat == 5
-    assert spookjes.opeetbaar == True
+    spookje = Spookjes("Blinky", "rood", 5, 5, True)
+    assert spookje.naam == "Blinky"
+    assert spookje.kleur == "rood"
+    assert spookje.x_coordinaat == 5
+    assert spookje.y_coordinaat == 5
+    assert spookje.opeetbaar == True
 
 
-#Unhappy Path Test######################################
+def test_hitpacman_opeetbaar():
+    spookje = Spookjes("Blinky", "rood", 5, 5, True)
+    class MockPacman:
+        def __init__(self):
+            self.score = 0
+            self.levens = 3
+
+    pacman = MockPacman()
+    spookje.hitpacman(pacman)
+    assert pacman.score == 10
+    assert pacman.levens == 3
+
+
+#unhappy path test######################################
+
+def test_hitpacman_onopeetbaar_unhappy():
+    spookje = Spookjes("Blinky", "rood", 5, 5, False)
+    class MockPacman:
+        def __init__(self):
+            self.score = 0
+            self.levens = 3
+
+    pacman = MockPacman()
+    spookje.hitpacman(pacman)
+    assert pacman.score == 0
+    assert pacman.levens == 3
 
 def test_spookjes_initialization_unhappy():
     with pytest.raises(ValueError):
-        spookjes = Spookjes("-1", "Blinky", "rood", 5, 5, True)
+        spookje = Spookjes(123, "rood", 5, 5, True)
+
+    with pytest.raises(ValueError):
+        spookje = Spookjes("Blinky", 456, 5, 5, True)
