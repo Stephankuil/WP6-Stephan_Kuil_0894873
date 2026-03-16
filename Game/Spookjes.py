@@ -16,7 +16,6 @@ class Spookjes:
     def hitpacman(self, pacman):
         if self.opeetbaar:
             pacman.score += 10
-            self.aantal_spookjes -= 1
         else:
             pacman.levens -= 1
 
