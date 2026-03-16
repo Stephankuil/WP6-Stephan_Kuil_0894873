@@ -14,6 +14,11 @@ def test_pacman_initialization():
     assert pacman.kleur == "geel"
     assert pacman.naam == "Pacman"
 
+
+def test_pacman_move():
+    assert False, "nog niet in gebruik"
+
+#unhappy path test######################################
 def test_pacman_initialization_unhappy():
     with pytest.raises(ValueError):
         pacman = Pacman("-1", 0, 0, 0, "geel", "Pacman")
