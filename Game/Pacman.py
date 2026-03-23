@@ -12,6 +12,7 @@ class Pacman:
         self.kleur = kleur
         self.naam = naam
 
+
     def move(self, direction):
         if direction == "up":
             self.Ycoordinaat += 1
@@ -21,6 +22,8 @@ class Pacman:
             self.Xcoordinaat -= 1
         elif direction == "right":
             self.Xcoordinaat += 1
+
+    def eat(self):
 
 
 
