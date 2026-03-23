@@ -24,6 +24,8 @@ class Pacman:
             self.Xcoordinaat += 1
 
     def eat(self):
+        self.score += 10
+
 
 
 
