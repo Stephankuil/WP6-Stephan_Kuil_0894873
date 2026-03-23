@@ -1,4 +1,4 @@
-class Level():
+class Levelmap():
     def __init__(self):
         self.LEVEL_MAP1 = [
             "############################",
