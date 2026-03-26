@@ -4,6 +4,10 @@ from Game.Engine import Engine
 
 #Happy Path Test######################################
 
-def test_engine_initialization():
-    assert False
+def test_engine_initialization(game):
+    engine = Engine(game)
+    engine.run()
+
+
+
 

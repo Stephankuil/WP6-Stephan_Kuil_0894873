@@ -52,7 +52,7 @@ class Levelmap():
     def is_wall(self, x, y):
         return self.get_tile(x, y) == "#"
 
-    def get_tile(self, x, y):
+    def get_tile(self, x, y):#out of bounds check
         if 0 <= y < len(self.LEVEL_MAP1) and 0 <= x < len(self.LEVEL_MAP1[y]):
             return self.LEVEL_MAP1[y][x]
         else:
