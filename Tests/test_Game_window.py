@@ -15,3 +15,6 @@ def test_game_window_initialization():
     assert game_window.hoogte == 600
     assert isinstance(game_window.window, pygame.Surface)
     game_window.exit_game()
+
+#unhappy path test######################################
+

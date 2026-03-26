@@ -1,8 +1,7 @@
 from Game.Kaasjes import Kaas
-class Levelmap():
+
+class Levelmap:
     def __init__(self):
-
-
         self.LEVEL_MAP1 = [
             "############################",
             "#            ##            #",
@@ -24,51 +23,49 @@ class Levelmap():
             "#                          #",
             "############################",
         ]
-        self.kaasjes = Kaas(self._find_kaas_posities())
-
 
         self.LEVEL_MAP2 = [
-                "##############################",
-                "              ##             #",
-                "#   ##    ##  ##    ##  ##   #",
-                "#   ##    ##  ##    ##  ##   #",
-                "#             ##             #",
-                "#   ########      #########  #",
-                "#                            #",
-                "#    #   #     #    #####    #",
-                "#    #   #     #        #    #",
-                "#    #####     #        #    #",
-                "#              #    #####    #",
-                "#                            #",
-                "#    ####  #####   ########  #",
-                "#          #####    #####    #",
-                "#      #                     #",
-                "#      #              ##     #",
-                "#    ########     #########  #",
-                "#                             ",
-                "##############################",
-            ]
+            "##############################",
+            "              ##             #",
+            "#   ##    ##  ##    ##  ##   #",
+            "#   ##    ##  ##    ##  ##   #",
+            "#             ##             #",
+            "#   ########      #########  #",
+            "#                            #",
+            "#    #   #     #    #####    #",
+            "#    #   #     #        #    #",
+            "#    #####     #        #    #",
+            "#              #    #####    #",
+            "#                            #",
+            "#    ####  #####   ########  #",
+            "#          #####    #####    #",
+            "#      #                     #",
+            "#      #              ##     #",
+            "#    ########     #########  #",
+            "#                             ",
+            "##############################",
+        ]
+
+        self.current_map = self.LEVEL_MAP1
+        self.kaasjes = Kaas(self._find_kaas_posities())
 
     def is_wall(self, x, y):
         return self.get_tile(x, y) == "#"
 
-    def get_tile(self, x, y):#out of bounds check
-        if 0 <= y < len(self.LEVEL_MAP1) and 0 <= x < len(self.LEVEL_MAP1[y]):
-            return self.LEVEL_MAP1[y][x]
-        else:
-            return None
+    def get_tile(self, x, y):
+        if 0 <= y < len(self.current_map) and 0 <= x < len(self.current_map[y]):
+            return self.current_map[y][x]
+        return None
 
     def get_tile_level1(self, x, y):
         if 0 <= y < len(self.LEVEL_MAP1) and 0 <= x < len(self.LEVEL_MAP1[y]):
             return self.LEVEL_MAP1[y][x]
-        else:
-            return None
+        return None
 
     def get_tile_level2(self, x, y):
         if 0 <= y < len(self.LEVEL_MAP2) and 0 <= x < len(self.LEVEL_MAP2[y]):
             return self.LEVEL_MAP2[y][x]
-        else:
-            return None
+        return None
 
     def _find_kaas_posities(self):
         posities = []

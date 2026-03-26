@@ -1,4 +1,4 @@
-class Spookjes:
+class Spook:
     def __init__(self, naam, kleur, x_coordinaat, y_coordinaat, opeetbaar):
         if not isinstance(naam, str):
             raise ValueError("naam moet een string zijn")
