@@ -1,23 +1,31 @@
 import pygame
 from sys import exit
 
-game_breedte = 800
-game_hoogte = 600
-pygame.init()
+class GameWindow():
+    def __init__(self, breedte, hoogte):
+        self.breedte = breedte
+        self.hoogte = hoogte
+        self.window = pygame.display.set_mode((self.breedte, self.hoogte))
+        pygame.display.set_caption("Pacman")
 
-window = pygame.display.set_mode((game_breedte, game_hoogte))
 
-pygame.display.set_caption("Pacman")
-klok = pygame.time.Clock()
+    game_breedte = 800
+    game_hoogte = 600
+    pygame.init()
 
-while True:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            exit()
+    window = pygame.display.set_mode((game_breedte, game_hoogte))
 
-    pygame.display.update()
-    klok.tick(60)
+    pygame.display.set_caption("Pacman")
+    klok = pygame.time.Clock()
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+
+        pygame.display.update()
+        klok.tick(60)
 
 
 
