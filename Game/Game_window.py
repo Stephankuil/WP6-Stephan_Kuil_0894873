@@ -8,24 +8,31 @@ class GameWindow():
         self.window = pygame.display.set_mode((self.breedte, self.hoogte))
         pygame.display.set_caption("Pacman")
 
+    def exit_game(self):
+        pygame.quit()
+
+
+
 
     game_breedte = 800
     game_hoogte = 600
-    pygame.init()
 
-    window = pygame.display.set_mode((game_breedte, game_hoogte))
+    if __name__ == "__main__":
+        pygame.init()
 
-    pygame.display.set_caption("Pacman")
-    klok = pygame.time.Clock()
+        window = pygame.display.set_mode((game_breedte, game_hoogte))
 
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                exit()
+        pygame.display.set_caption("Pacman")
+        klok = pygame.time.Clock()
 
-        pygame.display.update()
-        klok.tick(60)
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    exit()
+
+            pygame.display.update()
+            klok.tick(60)
 
 
 
