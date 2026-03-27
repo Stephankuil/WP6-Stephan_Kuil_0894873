@@ -8,11 +8,14 @@ from Spookjes import Spook
 
 def main():
     pygame.init()
-    game_window = GameWindow(800, 600)
+    game_window = GameWindow(850, 600)
     levelmap = Levelmap()
+    kaas = draw_kaas = Kaas(levelmap._find_kaas_posities())
     spook = Spook("bob", "geel", 10, 10, 0)
 
     game_window.run(levelmap)
 
 if __name__ == "__main__":
     main()
+
+

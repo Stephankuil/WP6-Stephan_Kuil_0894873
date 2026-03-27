@@ -38,6 +38,21 @@ class GameWindow:
                 else:
                     pygame.draw.rect(self.window, (0, 0, 0), rect)
 
+    def draw_kaas(self, levelmap):
+        tile_size = 30
+        kleur = levelmap.kaasjes.kleur  # 🔥 direct gebruiken
+
+        for (x, y) in levelmap.kaasjes.kaas_posities:
+            pygame.draw.circle(
+                self.window,
+                kleur,
+                (
+                    x * tile_size + tile_size // 2,
+                    y * tile_size + tile_size // 2
+                ),
+                5
+            )
+
     def update(self):
         pygame.display.update()
         self.klok.tick(60)
@@ -47,6 +62,7 @@ class GameWindow:
             self.handle_events()
             self.window.fill((0, 0, 0))
             self.draw_level(levelmap)
+            self.draw_kaas(levelmap)
             self.update()
 
         self.exit_game()
