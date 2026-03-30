@@ -1,6 +1,6 @@
 import pygame
 from sys import exit
-
+from Game.Pacman import Pacman
 import pygame
 
 
@@ -57,12 +57,20 @@ class GameWindow:
         pygame.display.update()
         self.klok.tick(60)
 
-    def run(self, levelmap):
+    def run(self, game):
         while self.running:
-            self.handle_events()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.running = False
+
+                if event.type == pygame.KEYDOWN:
+                    game.handle_input(event)
+
             self.window.fill((0, 0, 0))
-            self.draw_level(levelmap)
-            self.draw_kaas(levelmap)
+            self.draw_level(game.levelmap)
+            self.draw_kaas(game.levelmap)
+            game.pacman.draw(self.window, 30)
+
             self.update()
 
         self.exit_game()
