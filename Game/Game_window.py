@@ -74,6 +74,8 @@ class GameWindow:
                 spook.draw(self.window, 30)
             for spook in game.spookjes:
                 spook.random_move(game.levelmap)
+            game.Pacman_Raakt_Spook()
+
 
             self.update()
 

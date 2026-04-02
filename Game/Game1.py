@@ -8,6 +8,8 @@ class Game:
             Spook(10, 5, 200, (255, 0, 0), "Blinky", False),
             Spook(12, 10, 200, (255, 105, 180), "Pinky", False)
         ]
+        self.last_hit_time = 0
+
 
     def handle_input(self, event):
         oude_x = self.pacman.Xcoordinaat
@@ -25,3 +27,12 @@ class Game:
         if self.levelmap.is_wall(self.pacman.Xcoordinaat, self.pacman.Ycoordinaat):
             self.pacman.Xcoordinaat = oude_x
             self.pacman.Ycoordinaat = oude_y
+
+    def Pacman_Raakt_Spook(self):
+        current_time = pygame.time.get_ticks()
+        if current_time - self.last_hit_time > 1000:
+            for spook in self.spookjes:
+                if spook.Xcoordinaat == self.pacman.Xcoordinaat and spook.Ycoordinaat == self.pacman.Ycoordinaat:
+                    print("Pacman raakt spookje!")
+                    spook.raak_pacman(self.pacman)
+                    self.last_hit_time = current_time
