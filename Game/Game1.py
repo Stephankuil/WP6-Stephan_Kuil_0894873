@@ -1,5 +1,6 @@
 import pygame
 from Spookjes import Spook
+from Pacman import Pacman
 class Game:
     def __init__(self, levelmap, pacman):
         self.levelmap = levelmap
@@ -37,3 +38,7 @@ class Game:
                     spook.raak_pacman(self.pacman)
                     print(f"Pacman score: {self.pacman.score}, levens: {self.pacman.levens}")
                     self.last_hit_time = current_time
+
+
+    def Pacman_eet_kaas(self):
+        Pacman.kaasje_opeten(self.pacman, self.levelmap.kaasjes)

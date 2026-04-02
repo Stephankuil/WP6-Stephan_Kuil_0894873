@@ -26,8 +26,13 @@ class Pacman:
         elif direction == "right":
             self.Xcoordinaat += 1
 
-    def eat(self):
-        self.score += 10
+    def kaasje_opeten(self, kaas):
+        positie = (self.Xcoordinaat, self.Ycoordinaat)
+
+        if positie in kaas.kaas_posities:
+            kaas.kaas_posities.remove(positie)
+            self.score += 10
+            print("Pacman heeft een kaas gegeten! Score:", self.score)
 
     def draw(self, window, tile_size):
         pygame.draw.circle(

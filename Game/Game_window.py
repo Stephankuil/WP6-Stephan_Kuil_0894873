@@ -76,6 +76,8 @@ class GameWindow:
                 spook.random_move(game.levelmap)
             game.Pacman_Raakt_Spook()
 
+            game.Pacman_eet_kaas()
+
 
             self.update()
 

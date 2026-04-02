@@ -9,7 +9,6 @@ class Kaas:
     def eet_kaas(self, x, y):
         if (x, y) in self.kaas_posities:
             self.kaas_posities.remove((x, y))
-            print(f"Kaas gegeten op {x},{y}")
             return True
         return False
 
