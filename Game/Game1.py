@@ -35,4 +35,5 @@ class Game:
                 if spook.Xcoordinaat == self.pacman.Xcoordinaat and spook.Ycoordinaat == self.pacman.Ycoordinaat:
                     print("Pacman raakt spookje!")
                     spook.raak_pacman(self.pacman)
+                    print(f"Pacman score: {self.pacman.score}, levens: {self.pacman.levens}")
                     self.last_hit_time = current_time
