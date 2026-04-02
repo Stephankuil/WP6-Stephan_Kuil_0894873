@@ -1,9 +1,13 @@
 import pygame
-
+from Spookjes import Spook
 class Game:
     def __init__(self, levelmap, pacman):
         self.levelmap = levelmap
         self.pacman = pacman
+        self.spookjes = [
+            Spook(10, 5, 200, (255, 0, 0), "Blinky", False),
+            Spook(12, 10, 200, (255, 105, 180), "Pinky", False)
+        ]
 
     def handle_input(self, event):
         oude_x = self.pacman.Xcoordinaat

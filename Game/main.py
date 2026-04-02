@@ -12,7 +12,7 @@ def main():
     game_window = GameWindow(850, 600)
     levelmap = Levelmap()
     kaas = draw_kaas = Kaas(levelmap._find_kaas_posities())
-    spook = Spook("bob", "geel", 10, 10, 0)
+
     pacman = Pacman(
         levens=3,Xcoordinaat=1,Ycoordinaat=1,score=0,kleur=(255, 0, 255),naam="Pacman"
     )

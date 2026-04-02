@@ -70,6 +70,10 @@ class GameWindow:
             self.draw_level(game.levelmap)
             self.draw_kaas(game.levelmap)
             game.pacman.draw(self.window, 30)
+            for spook in game.spookjes:
+                spook.draw(self.window, 30)
+            for spook in game.spookjes:
+                spook.random_move(game.levelmap)
 
             self.update()
 
