@@ -3,6 +3,7 @@ from sys import exit
 from Game.Pacman import Pacman
 import pygame
 from Game1 import Game
+from highscore_screen import HighscoreScreen
 
 class GameWindow:
     def __init__(self, breedte, hoogte):
@@ -79,8 +80,9 @@ class GameWindow:
 
             # Meteen stoppen als Pacman dood is
             if game.check_game_over():
+                highscore_screen = HighscoreScreen(self.window, self.breedte, self.hoogte)
+                highscore_screen.show(game.pacman.score)
                 self.running = False
-                break
 
             for spook in game.spookjes:
                 spook.random_move(game.levelmap)
