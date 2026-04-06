@@ -10,6 +10,7 @@ class Game:
             Spook(12, 10, 200, (255, 105, 180), "Pinky", False)
         ]
         self.last_hit_time = 0
+        self.game_over = False
 
 
     def handle_input(self, event):
@@ -42,3 +43,10 @@ class Game:
 
     def Pacman_eet_kaas(self):
         Pacman.kaasje_opeten(self.pacman, self.levelmap.kaasjes)
+
+    def check_game_over(self):
+        if self.pacman.levens == 0:
+            add_score(self.pacman.naam, self.pacman.score)
+            self.pacman.levens = -1  # Zorg dat dit maar één keer gebeurt
+
+

@@ -2,7 +2,7 @@ import pygame
 from sys import exit
 from Game.Pacman import Pacman
 import pygame
-
+from Game1 import Game
 
 class GameWindow:
     def __init__(self, breedte, hoogte):
@@ -77,6 +77,7 @@ class GameWindow:
             game.Pacman_Raakt_Spook()
 
             game.Pacman_eet_kaas()
+            game.check_game_over()
 
 
             self.update()

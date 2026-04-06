@@ -1,5 +1,5 @@
 import pygame
-
+import sqlite3
 
 class Pacman:
     def __init__(self, levens, Xcoordinaat, Ycoordinaat, score, kleur, naam):
@@ -44,3 +44,16 @@ class Pacman:
             ),
             tile_size // 2 - 2
         )
+
+
+    def add_score(name, score):
+        conn = sqlite3.connect("Pacman.db")
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            INSERT INTO scores (name, score)
+            VALUES (?, ?)
+        """, (name, score))
+
+        conn.commit()
+        conn.close()
