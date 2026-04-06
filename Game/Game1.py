@@ -1,6 +1,7 @@
 import pygame
 from Spookjes import Spook
 from Pacman import Pacman
+from Engine import Engine
 class Game:
     def __init__(self, levelmap, pacman):
         self.levelmap = levelmap
@@ -46,7 +47,9 @@ class Game:
 
     def check_game_over(self):
         if self.pacman.levens == 0:
-            add_score(self.pacman.naam, self.pacman.score)
-            self.pacman.levens = -1  # Zorg dat dit maar één keer gebeurt
-
+            self.pacman.add_score()
+            self.pacman.levens = -1
+            print("Game over! Score opgeslagen.")
+            return True
+        return False
 

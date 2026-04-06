@@ -45,15 +45,14 @@ class Pacman:
             tile_size // 2 - 2
         )
 
-
-    def add_score(name, score):
+    def add_score(self):
         conn = sqlite3.connect("Pacman.db")
         cursor = conn.cursor()
 
         cursor.execute("""
             INSERT INTO scores (name, score)
             VALUES (?, ?)
-        """, (name, score))
+        """, (self.naam, self.score))
 
         conn.commit()
         conn.close()

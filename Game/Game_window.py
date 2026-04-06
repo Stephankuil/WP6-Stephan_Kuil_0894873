@@ -69,16 +69,23 @@ class GameWindow:
             self.window.fill((0, 0, 0))
             self.draw_level(game.levelmap)
             self.draw_kaas(game.levelmap)
+
             game.pacman.draw(self.window, 30)
+
             for spook in game.spookjes:
                 spook.draw(self.window, 30)
-            for spook in game.spookjes:
-                spook.random_move(game.levelmap)
+
             game.Pacman_Raakt_Spook()
 
-            game.Pacman_eet_kaas()
-            game.check_game_over()
+            # Meteen stoppen als Pacman dood is
+            if game.check_game_over():
+                self.running = False
+                break
 
+            for spook in game.spookjes:
+                spook.random_move(game.levelmap)
+
+            game.Pacman_eet_kaas()
 
             self.update()
 
