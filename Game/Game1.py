@@ -1,7 +1,7 @@
 import pygame
-from Spookjes import Spook
-from Pacman import Pacman
-from Engine import Engine
+from Game.Spookjes import Spook
+from Game.Pacman import Pacman
+from Game.Engine import Engine
 class Game:
     def __init__(self, levelmap, pacman):
         self.levelmap = levelmap
