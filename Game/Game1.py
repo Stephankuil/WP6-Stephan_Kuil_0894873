@@ -8,7 +8,9 @@ class Game:
         self.pacman = pacman
         self.spookjes = [
             Spook(10, 5, 200, (255, 0, 0), "Blinky", False),
-            Spook(12, 10, 200, (255, 105, 180), "Pinky", False)
+            Spook(12, 10, 200, (255, 105, 180), "Pinky", False),
+            Spook(8, 8, 200, (255, 105, 180), "Pinky", False),
+            Spook(6, 6, 200, (255, 105, 180), "Pinky", False)
         ]
         self.last_hit_time = 0
         self.game_over = False
