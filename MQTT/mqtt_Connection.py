@@ -32,6 +32,7 @@ class GameMQTT:
         # Store the player name and room name
         self.player_id = player_id
         self.room = room
+        self.players_in_lobby = []
 
         # This dictionary will contain all players received from the 'state' topic
         # Example:
@@ -110,6 +111,7 @@ class GameMQTT:
             # 'input' is published by the players
             client.subscribe(self.state_topic)
             client.subscribe(self.input_topic)
+            client.subscribe(f"pacman/{self.room}/join")
 
             print(f"[MQTT] Subscribed to: {self.state_topic}")
             print(f"[MQTT] Subscribed to: {self.input_topic}")
@@ -123,31 +125,56 @@ class GameMQTT:
         """
         This method is called automatically when a subscribed message is received.
 
-        Parameters:
-        client: The MQTT client instance
-        userdata: Optional user data
-        msg: The received MQTT message object
+        It processes different types of messages:
+        - state messages (game positions)
+        - input messages (player movement)
+        - join messages (players entering the lobby)
         """
 
         try:
-            # Convert the received JSON string back into a Python dictionary
+            # Convert the incoming message from JSON string to Python dictionary
             data = json.loads(msg.payload.decode())
 
             print(f"[MQTT] Message received on topic: {msg.topic}")
             print(f"[MQTT] Data: {data}")
 
-            # If the message comes from the state topic,
-            # it usually contains all player positions from the host
+            # ---------------------------------------------------------
+            # 1. GAME STATE (from host)
+            # ---------------------------------------------------------
+            # Contains positions of all players
             if msg.topic == self.state_topic:
                 self.players = data
 
-            # If the message comes from the input topic,
-            # it contains a movement command from one player
+            # ---------------------------------------------------------
+            # 2. PLAYER INPUT (movement)
+            # ---------------------------------------------------------
+            # Contains direction from a player
             elif msg.topic == self.input_topic:
                 self.received_inputs.append(data)
 
+            # ---------------------------------------------------------
+            # 3. PLAYER JOIN (lobby system)
+            # ---------------------------------------------------------
+            elif msg.topic == f"pacman/{self.room}/join":
+
+                player_id = data["player_id"]
+
+                # Prevent duplicates
+                if player_id not in self.players_in_lobby:
+                    self.players_in_lobby.append(player_id)
+
+                    print(f"[MQTT] Player joined lobby: {player_id}")
+                    print(f"[MQTT] Current players: {self.players_in_lobby}")
+
         except json.JSONDecodeError:
             print("[MQTT] Error: received message is not valid JSON.")
+
+    def send_join(self):
+        data = {
+            "player_id": self.player_id
+        }
+
+        self.client.publish(f"pacman/{self.room}/join", json.dumps(data))
 
     def on_disconnect(self, client, userdata, rc):
         """
