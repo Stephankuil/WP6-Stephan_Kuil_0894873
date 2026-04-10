@@ -3,15 +3,33 @@ import random
 
 class Spook:
     def __init__(self, Xcoordinaat, Ycoordinaat, score, kleur, naam, opeetbaar):
-
         self.Xcoordinaat = Xcoordinaat
         self.Ycoordinaat = Ycoordinaat
+
+        # Save start position (important for reset after being eaten)
+        self.start_x = Xcoordinaat
+        self.start_y = Ycoordinaat
+
         self.score = score
         self.kleur = kleur
         self.naam = naam
+
         self.opeetbaar = opeetbaar
+
         self.last_move_time = 0
-        self.move_delay = 300  # milliseconden
+        self.move_delay = 300  # milliseconds
+
+    def maak_opeetbaar(self):
+        """
+        Make the ghost edible.
+        """
+        self.opeetbaar = True
+
+    def maak_normaal(self):
+        """
+        Make the ghost dangerous again.
+        """
+        self.opeetbaar = False
 
     def move(self, direction):
         if direction == "up":
