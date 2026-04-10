@@ -1,6 +1,6 @@
 import pytest
 from Game.Game1 import Game
-from Game.LEVEL import Levelmap
+from Game.level import Levelmap
 from Game.Pacman import Pacman
 from Game.Spookjes import Spook
 def test_Game1():

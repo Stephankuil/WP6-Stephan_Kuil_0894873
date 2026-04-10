@@ -1,5 +1,5 @@
 import pytest
-from Game.LEVEL import Levelmap
+from Game.level import Levelmap
 from Game.Kaasjes import Kaas
 
 #Happy Path Test######################################

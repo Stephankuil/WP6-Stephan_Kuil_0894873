@@ -1,7 +1,7 @@
 import pygame
 from Home_screen import HomeScreen
 from Game_window import GameWindow
-from LEVEL import Levelmap
+from level import Levelmap
 from Pacman import Pacman
 from Game import Game1
 

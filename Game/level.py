@@ -57,15 +57,6 @@ class Levelmap:
             return self.current_map[y][x]
         return None
 
-    def get_tile_level1(self, x, y):
-        if 0 <= y < len(self.LEVEL_MAP1) and 0 <= x < len(self.LEVEL_MAP1[y]):
-            return self.LEVEL_MAP1[y][x]
-        return None
-
-    def get_tile_level2(self, x, y):
-        if 0 <= y < len(self.LEVEL_MAP2) and 0 <= x < len(self.LEVEL_MAP2[y]):
-            return self.LEVEL_MAP2[y][x]
-        return None
 
     def _find_kaas_posities(self):
         posities = []

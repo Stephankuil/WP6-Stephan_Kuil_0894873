@@ -1,5 +1,5 @@
 import pytest
-from Game.LEVEL import Levelmap
+from Game.level import Levelmap
 
 
 def test_level():
