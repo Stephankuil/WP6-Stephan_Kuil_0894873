@@ -1,6 +1,6 @@
 import json
 import ssl
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, asdict
 from typing import List, Dict, Optional
 
 import paho.mqtt.client as mqtt
@@ -8,13 +8,6 @@ import paho.mqtt.client as mqtt
 
 @dataclass(frozen=True)
 class MQTTConfig:
-    """
-    Stores all broker connection settings in one place.
-
-    Why this is useful:
-    - Single Responsibility: this class only stores configuration
-    - Easy to replace later if you want to load from .env or settings.py
-    """
     broker_host: str
     broker_port: int
     username: str
@@ -23,13 +16,6 @@ class MQTTConfig:
 
 @dataclass(frozen=True)
 class RoomTopics:
-    """
-    Builds all MQTT topics for one room.
-
-    Why this is useful:
-    - No repeated hardcoded topic strings everywhere
-    - Easy to add more topics later
-    """
     room_code: str
 
     @property
@@ -59,48 +45,37 @@ class RoomTopics:
 
 @dataclass
 class LobbyState:
-    """
-    Stores the current lobby state.
-
-    Why this is useful:
-    - Keeps lobby-related state together
-    - Easy to understand and inspect
-    """
     players: List[str] = field(default_factory=list)
     host_player: Optional[str] = None
     game_started: bool = False
 
     def add_player(self, player_id: str) -> None:
-        """
-        Add a player only if they are not already in the lobby list.
-        """
         if player_id not in self.players:
             self.players.append(player_id)
 
     def remove_player(self, player_id: str) -> None:
-        """
-        Remove a player if present.
-        """
         if player_id in self.players:
             self.players.remove(player_id)
 
     def set_host_if_missing(self, player_id: str) -> None:
-        """
-        Set host only if no host is known yet.
-        """
         if self.host_player is None:
             self.host_player = player_id
 
 
+@dataclass
+class PlayerState:
+    player_id: str
+    x: int
+    y: int
+    direction: str = "stop"
+    score: int = 0
+    lives: int = 3
+
+    def to_dict(self) -> Dict:
+        return asdict(self)
+
+
 class MQTTMessageFactory:
-    """
-    Creates outgoing MQTT message payloads.
-
-    Why this is useful:
-    - Single Responsibility: only builds message dictionaries
-    - Keeps GameMQTT cleaner
-    """
-
     @staticmethod
     def create_join_message(player_id: str, is_host: bool) -> Dict:
         return {
@@ -135,34 +110,14 @@ class MQTTMessageFactory:
         }
 
     @staticmethod
-    def create_game_state_message(state: Dict) -> Dict:
-        return state
+    def create_game_state_message(players_state: Dict[str, Dict]) -> Dict:
+        return {
+            "players": players_state
+        }
 
 
 class GameMQTT:
-    """
-    Main class that handles MQTT communication for the multiplayer Pacman game.
-
-    Main responsibilities:
-    - connect to the broker
-    - subscribe to room topics
-    - send and receive lobby messages
-    - send and receive gameplay messages
-    - expose simple properties that the rest of the game can use
-
-    Design note:
-    This class acts as the communication layer between your game and MQTT.
-    """
-
     def __init__(self, config: MQTTConfig, player_id: str, room_code: str, is_host: bool):
-        """
-        Parameters:
-        - config: MQTT connection settings
-        - player_id: unique player name/id
-        - room_code: room/lobby identifier
-        - is_host: True if this player hosts the room
-        """
-
         self.config = config
         self.player_id = player_id
         self.room_code = room_code
@@ -170,13 +125,17 @@ class GameMQTT:
 
         self.topics = RoomTopics(room_code)
         self.lobby_state = LobbyState()
-        self.received_inputs: List[Dict] = []
-        self.players_state: Dict = {}
 
-        # This flag becomes True when a start_game message is received
+        # Alleen host gebruikt deze queue echt actief
+        self.received_inputs: List[Dict] = []
+
+        # Deze state bevat alle spelers in de game
+        # host: bron van waarheid
+        # client: laatst ontvangen state van host
+        self.players_state: Dict[str, Dict] = {}
+
         self.start_game_received = False
 
-        # MQTT client setup
         self.client = mqtt.Client()
         self.client.username_pw_set(self.config.username, self.config.password)
         self.client.tls_set(cert_reqs=ssl.CERT_REQUIRED)
@@ -190,18 +149,11 @@ class GameMQTT:
     # ---------------------------------------------------------
 
     def connect(self) -> None:
-        """
-        Connect to the MQTT broker and start the background loop.
-        """
         self.client.connect(self.config.broker_host, self.config.broker_port)
         self.client.loop_start()
 
     def disconnect(self) -> None:
-        """
-        Disconnect cleanly from the MQTT broker.
-        """
         self.send_leave()
-
         self.client.loop_stop()
         self.client.disconnect()
 
@@ -210,9 +162,6 @@ class GameMQTT:
     # ---------------------------------------------------------
 
     def on_connect(self, client, userdata, flags, rc) -> None:
-        """
-        Called automatically when the client connects to the broker.
-        """
         print(f"[MQTT] Connected with result code: {rc}")
 
         if rc != 0:
@@ -221,7 +170,6 @@ class GameMQTT:
 
         print("[MQTT] Connection successful.")
 
-        # Subscribe to all topics needed for lobby + gameplay
         client.subscribe(self.topics.join)
         client.subscribe(self.topics.leave)
         client.subscribe(self.topics.lobby_state)
@@ -237,17 +185,9 @@ class GameMQTT:
         print(f"[MQTT] Subscribed to: {self.topics.state}")
 
     def on_disconnect(self, client, userdata, rc) -> None:
-        """
-        Called automatically when the client disconnects.
-        """
         print(f"[MQTT] Disconnected with result code: {rc}")
 
     def on_message(self, client, userdata, msg) -> None:
-        """
-        Called automatically when a subscribed message is received.
-
-        This method routes the message to the correct internal handler.
-        """
         try:
             data = json.loads(msg.payload.decode())
 
@@ -280,9 +220,6 @@ class GameMQTT:
     # ---------------------------------------------------------
 
     def _handle_join_message(self, data: Dict) -> None:
-        """
-        Process a player joining the room.
-        """
         player_id = data.get("player_id")
         is_host = data.get("is_host", False)
 
@@ -296,18 +233,15 @@ class GameMQTT:
         else:
             self.lobby_state.set_host_if_missing(player_id)
 
+        if self.is_host:
+            self.add_player_to_game(player_id)
+            self.send_lobby_state()
+
         print(f"[MQTT] Player joined lobby: {player_id}")
         print(f"[MQTT] Players now: {self.lobby_state.players}")
         print(f"[MQTT] Host: {self.lobby_state.host_player}")
 
-        # If this client is the host, it becomes the source of truth for lobby state
-        if self.is_host:
-            self.send_lobby_state()
-
     def _handle_leave_message(self, data: Dict) -> None:
-        """
-        Process a player leaving the room.
-        """
         player_id = data.get("player_id")
 
         if not player_id:
@@ -315,21 +249,14 @@ class GameMQTT:
 
         self.lobby_state.remove_player(player_id)
 
-        # If the host leaves, host stays unchanged for now.
-        # Later you could implement host migration here.
+        if self.is_host:
+            self.remove_player_from_game(player_id)
+            self.send_lobby_state()
+
         print(f"[MQTT] Player left lobby: {player_id}")
         print(f"[MQTT] Players now: {self.lobby_state.players}")
 
-        if self.is_host:
-            self.send_lobby_state()
-
     def _handle_lobby_state_message(self, data: Dict) -> None:
-        """
-        Process the full lobby state.
-
-        This is very important because it solves the problem where a new player
-        joins later and still needs to know the full list of players.
-        """
         players = data.get("players", [])
         host_player = data.get("host_player")
 
@@ -340,9 +267,6 @@ class GameMQTT:
         print(f"[MQTT] Host player: {self.lobby_state.host_player}")
 
     def _handle_start_game_message(self, data: Dict) -> None:
-        """
-        Process the message that tells all players to start the game.
-        """
         self.lobby_state.game_started = True
         self.start_game_received = True
 
@@ -350,27 +274,84 @@ class GameMQTT:
         print(f"[MQTT] Start game received from: {started_by}")
 
     def _handle_input_message(self, data: Dict) -> None:
-        """
-        Process a player input message.
-
-        Usually the host will read these inputs and update the real game state.
-        """
-        self.received_inputs.append(data)
+        # Alleen host hoeft input op te slaan om te verwerken
+        if self.is_host:
+            self.received_inputs.append(data)
 
     def _handle_game_state_message(self, data: Dict) -> None:
-        """
-        Process the full game state from the host.
-        """
-        self.players_state = data
+        self.players_state = data.get("players", {})
+        print(f"[MQTT] Players state updated: {self.players_state}")
+
+    # ---------------------------------------------------------
+    # GAME STATE HELPERS
+    # ---------------------------------------------------------
+
+    def add_player_to_game(self, player_id: str) -> None:
+        if player_id in self.players_state:
+            return
+
+        spawn_positions = [
+            (5, 5),
+            (7, 5),
+            (9, 5),
+            (11, 5)
+        ]
+
+        index = len(self.players_state)
+        if index < len(spawn_positions):
+            spawn_x, spawn_y = spawn_positions[index]
+        else:
+            spawn_x = 5 + (index * 2)
+            spawn_y = 5
+
+        player = PlayerState(
+            player_id=player_id,
+            x=spawn_x,
+            y=spawn_y
+        )
+
+        self.players_state[player_id] = player.to_dict()
+
+    def remove_player_from_game(self, player_id: str) -> None:
+        if player_id in self.players_state:
+            del self.players_state[player_id]
+
+    def pop_received_inputs(self) -> List[Dict]:
+        inputs = self.received_inputs[:]
+        self.received_inputs.clear()
+        return inputs
+
+    def set_player_direction(self, player_id: str, direction: str) -> None:
+        if player_id not in self.players_state:
+            return
+
+        self.players_state[player_id]["direction"] = direction
+
+    def move_player(self, player_id: str, dx: int, dy: int) -> None:
+        if player_id not in self.players_state:
+            return
+
+        self.players_state[player_id]["x"] += dx
+        self.players_state[player_id]["y"] += dy
+
+    def get_local_player(self) -> Optional[Dict]:
+        return self.players_state.get(self.player_id)
+
+    def get_remote_players(self) -> Dict[str, Dict]:
+        return {
+            pid: pdata
+            for pid, pdata in self.players_state.items()
+            if pid != self.player_id
+        }
+
+    def build_game_state(self) -> Dict:
+        return MQTTMessageFactory.create_game_state_message(self.players_state)
 
     # ---------------------------------------------------------
     # PUBLIC SEND METHODS
     # ---------------------------------------------------------
 
     def send_join(self) -> None:
-        """
-        Tell the room that this player has joined.
-        """
         payload = MQTTMessageFactory.create_join_message(
             player_id=self.player_id,
             is_host=self.is_host
@@ -380,18 +361,12 @@ class GameMQTT:
         print(f"[MQTT] Sent join message: {payload}")
 
     def send_leave(self) -> None:
-        """
-        Tell the room that this player has left.
-        """
         payload = MQTTMessageFactory.create_leave_message(self.player_id)
 
         self.client.publish(self.topics.leave, json.dumps(payload))
         print(f"[MQTT] Sent leave message: {payload}")
 
     def send_lobby_state(self) -> None:
-        """
-        Host sends the full lobby state to everyone.
-        """
         payload = MQTTMessageFactory.create_lobby_state_message(
             players=self.lobby_state.players,
             host_player=self.lobby_state.host_player
@@ -401,18 +376,12 @@ class GameMQTT:
         print(f"[MQTT] Sent lobby state: {payload}")
 
     def send_start_game(self) -> None:
-        """
-        Host tells every client in the room to start the game.
-        """
         payload = MQTTMessageFactory.create_start_game_message(self.player_id)
 
         self.client.publish(self.topics.start_game, json.dumps(payload))
         print(f"[MQTT] Sent start game message: {payload}")
 
     def send_input(self, direction: str) -> None:
-        """
-        Send player movement input.
-        """
         payload = MQTTMessageFactory.create_input_message(
             player_id=self.player_id,
             direction=direction
@@ -421,11 +390,8 @@ class GameMQTT:
         self.client.publish(self.topics.input, json.dumps(payload))
         print(f"[MQTT] Sent input: {payload}")
 
-    def send_game_state(self, state: Dict) -> None:
-        """
-        Host sends the full game state to all clients.
-        """
-        payload = MQTTMessageFactory.create_game_state_message(state)
+    def send_game_state(self) -> None:
+        payload = self.build_game_state()
 
         self.client.publish(self.topics.state, json.dumps(payload))
         print(f"[MQTT] Sent game state: {payload}")
