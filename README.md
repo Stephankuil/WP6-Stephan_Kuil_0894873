@@ -3,6 +3,8 @@ Werkplaats 6 pacman
 
 
 Maak een virtual invironment aan
+
+python -m venv venv
 venv\Scripts\activate
 
 Install de requirements
